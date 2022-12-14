@@ -1,14 +1,17 @@
 #!/usr/bin/python3
 
-import threading
+from threading import Thread, Semaphore, Lock
 import time
 from random import randint
 import sys
 
 
-class MyThread(threading.Thread):
+class MyThread(Thread):
+    #semaphore = Semaphore(1)
+    mutex = Lock()
+
     def __init__(self, name):
-        threading.Thread.__init__(self)
+        Thread.__init__(self)
         self.name = name
 
     def run(self):
@@ -29,11 +32,21 @@ class MyThread(threading.Thread):
                              " + " + str(b[i]) + " = "
                              + str(c[i]) + "\n")
             i += 1
+        """
+        with MyThread.semaphore:
+            print("Hello my Name is: " + self.name)
 
-        print("Hello my Name is: " + self.name)
+            for i in range(0,values):
+                print(self.name + ":c[" + str(i) + "]=" + str(c[i]))"""
+        MyThread.mutex.acquire()
+        try:
+            print("Hello my Name is: " + self.name)
 
-        for i in range(0,values):
-            print(self.name + ":c[" + str(i) + "]=" + str(c[i]))
+            for i in range(0, values):
+                print(self.name + ":c[" + str(i) + "]=" + str(c[i]))
+        finally:
+            MyThread.mutex.release()
+
 
 
 threads = []
